@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Ingredients </title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <link rel = "stylesheet" type = "text/css" href = "{% static 'css/bootstrap-tokenfield.css' %}" />
+    <link rel = "stylesheet" type = "text/css" href = "{% static 'css/bootstrap-typehead.css' %}" />
+    <link rel = "stylesheet" type = "text/css" href = "{% static 'css/style.css' %}" />
+
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/bootstrap-tokenfield.min.js' %}"></script>
+    <script>
+      $(document).ready(function(){
+        $('#tokenfield').tokenfield()
+
+        $('#tokenfield').on('tokenfield:createtoken', function (e) {
+        	var existingTokens = $(this).tokenfield('getTokens');
+          if(existingTokens.reduce((x, y) => x || y.value === e.attrs.value, false)){
+            e.preventDefault();
+          } else {
+            $.get(`add/${e.attrs.value}`, function(data){
+              console.log(data[0].pk)
+            })
+          }
+        });
+
+        $('#tokenfield').on('tokenfield:removedtoken', function (e) {
+          $.get(`${e.attrs.value}/delete`, function(data){
+            console.log(data)
+          })
+        })
+      });
+    </script>
+
+      <div class="container">
+        <div class="row justify-content-md-center">
+          <center> <h1> Ingredients </h1> </center>
+        </div>
+        <div class="row justify-content-md-center">
+          <div class="col col-sm-1">
+          </div>
+          <div class="col col-sm-10">
+            <input type="text" class="form-control" id="tokenfield" value="{{ tokens }}"/>
+          </div>
+          <div class="col col-sm-1">
+          </div>
+        </div>
+      </div>
+
+  </body>
+</html>
