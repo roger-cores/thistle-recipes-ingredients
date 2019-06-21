@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Ingredients </title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <link rel = "stylesheet" type = "text/css" href = "{% static 'css/bootstrap-tokenfield.css' %}" />
+    <link rel = "stylesheet" type = "text/css" href = "{% static 'css/style.css' %}" />
+
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/bootstrap-tokenfield.min.js' %}"></script>
+    <script>
+    $(document).ready(function(){
+      $('input').tokenfield()
+
+      $('input').on('tokenfield:createtoken', function (e) {
+        var existingTokens = $(this).tokenfield('getTokens');
+        if(existingTokens.reduce((x, y) => x || y.value === e.attrs.value, false)){
+          e.preventDefault();
+        } else {
+          //server call /:recipe/ingredient/:ingredient
+          let recipe = $(this)[0].id
+          let ingredient = e.attrs.value
+
+          $.ajax({
+              url: `${recipe}/ingredient/${ingredient}`,
+              type: 'POST',
+              success: function(result) {
+                  console.log(result)
+              }
+          });
+
+        }
+      });
+
+      $('input').on('tokenfield:removedtoken', function (e) {
+        //server call /:recipe/ingredient/:ingredient
+        let recipe = $(this)[0].id
+        let ingredient = e.attrs.value
+
+        $.ajax({
+            url: `${recipe}/ingredient/${ingredient}`,
+            type: 'DELETE',
+            success: function(result) {
+                console.log('deleted')
+            }
+        });
+
+      })
+
+    });
+    </script>
+
+      <div class="container">
+        <div class="row justify-content-md-center">
+          <center> <h1> Recipes </h1> </center>
+          <div class="col col-sm-1">
+          </div>
+          <div class="col col-sm-10">
+            {% if recipes %}
+              <ul>
+                {% for recipe in recipes %}
+                  <p style="padding-top: 20px;"> {{ recipe.name }} </p>
+                  <input type="text" class="form-control tokenfield" id="{{ recipe.name }}" value="{{ recipe.ing }}"/>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span> No recipes were found </span>
+            {% endif %}
+          </div>
+          <div class="col col-sm-1">
+          </div>
+
+
+        </div>
+      </div>
+
+  </body>
+</html>

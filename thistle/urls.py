@@ -19,6 +19,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('recipes/', include('recipes.urls')),
+    path('recipes2/', include('recipes2.urls')),
     path('admin/', admin.site.urls),
 ]
 
